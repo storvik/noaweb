@@ -1,0 +1,26 @@
+{
+    "app":"no.appname",
+    "dev": {
+        "Hostname": "www.example.com",
+        "Port": 8080,
+        "TLS": false,
+        "TLSCache": "",
+        "TLSEmail": "ex@ample.com",
+        "UserConfig": {
+            "dbPort": "54321",
+            "emailRecipient": "dev@recipient.com"
+        }
+    },
+    "prod": {
+        "Hostname": "www.example.com",
+        "Port": 8080,
+        "TLS": false,
+        "TLSCache": "/var/no.vaegamat/certs/",
+        "TLSEmail": "ex@ample.com",
+        "AssetsDir": "/var/no.appname/public/",
+        "UserConfig": {
+            "dbPort": "5432",
+            "emailRecipient": "prod@recipient.no"
+        }
+    }
+}
