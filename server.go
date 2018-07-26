@@ -2,6 +2,7 @@ package noaweb
 
 import (
 	t "crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,9 +15,10 @@ import (
 func (i *Instance) Serve() {
 
 	if !i.TLS {
+		fmt.Printf("Serving without TLS on port: %s\n", strconv.Itoa(i.Port))
 		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(i.Port), csrf.Protect([]byte("32-byte-long-auth-key"), csrf.Secure(false))(i.router)))
 	} else {
-
+		fmt.Printf("Serving with TLS on port: %s\n", strconv.Itoa(i.Port))
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
 			HostPolicy: autocert.HostWhitelist(i.Hostname),
@@ -25,12 +27,18 @@ func (i *Instance) Serve() {
 		}
 
 		server := &http.Server{
-			Addr:    ":443",
+			Addr:    ":" + strconv.Itoa(i.Port),
 			Handler: csrf.Protect([]byte("32-byte-long-auth-key"))(i.router),
 			TLSConfig: &t.Config{
 				GetCertificate: certManager.GetCertificate,
 			},
 		}
+
+		// Redirect http to https
+		go func() {
+			h := certManager.HTTPHandler(nil)
+			log.Fatal(http.ListenAndServe(":http", h))
+		}()
 
 		log.Fatal(server.ListenAndServeTLS("", ""))
 	}
